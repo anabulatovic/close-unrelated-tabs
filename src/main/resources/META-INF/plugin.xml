@@ -1,0 +1,51 @@
+<idea-plugin>
+    <id>com.anabulatovic.close-unrelated-tabs</id>
+
+    <name>Close Unrelated Tabs</name>
+
+    <vendor url="https://www.github.com/anabulatovic">Ana Bulatovic</vendor>
+
+    <description><![CDATA[
+        <p>Close all editor tabs that are not related to the current file.</p>
+
+        <p>Right-click on any editor tab amd select <b>"Close Unrelated Tabs"</b> to keep only tabs that:</p>
+        <ul>
+            <li>Reference the clicked file (imports, usages)</li>
+            <li>Are referenced by the clicked file</li>
+        </ul>
+
+        <h3>Features</h3>
+        <ul>
+            <li>Configurable reference depth (direct or transitive)</li>
+            <li>Protect pinned tabs, modified files, and test files</li>
+            <li>Preview tabs before closing</li>
+            <li>Exclude files by pattern</li>
+        </ul>
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <resource-bundle>messages.MessageBundle</resource-bundle>
+    <extensions defaultExtensionNs="com.intellij">
+        <toolWindow id="MyToolWindow" factoryClass="com.anabulatovic.closeunrelatedtabs.ToolWindowFactoryImpl"
+                    icon="AllIcons.Toolwindows.ToolWindowPalette"/>
+        <applicationService serviceImplementation="com.anabulatovic.closeunrelatedtabs.CloseUnrelatedTabsSettings"/>
+        <applicationConfigurable
+            parentId="editor"
+            instance="com.anabulatovic.closeunrelatedtabs.CloseUnrelatedTabsConfigurable"
+            id="com.anabulatovic.closeunrelatedtabsCloseUnrelatedTabsConfigurable"
+            displayName="Close Unrelated Tabs"/>
+
+    </extensions>
+
+    <actions>
+        <action id="com.anabulatovic.closeunrelatedtabs.CloseUnrelatedTabsAction"
+                class="com.anabulatovic.closeunrelatedtabs.CloseUnrelatedTabsAction"
+                text="Close Unrelated Tabs"
+                description="Close all tabs that don't reference or are not referenced by this file">
+
+            <add-to-group group-id="EditorTabPopupMenu"
+                          anchor="first"/>
+
+        </action>
+    </actions>
+</idea-plugin>
