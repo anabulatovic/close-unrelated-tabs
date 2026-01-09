@@ -78,6 +78,14 @@ public class CloseUnrelatedTabsConfigurable implements Configurable {
 
     @Override
     public void apply() {
-        // impl
+        CloseUnrelatedTabsSettings settings = CloseUnrelatedTabsSettings.getInstance();
+
+        settings.setShowConfirmationDialog(showConfirmationDialogCheckBox.isSelected());
+        settings.setKeepModifiedTabs(keepModifiedTabsCheckBox.isSelected());
+        settings.setKeepCorrespondingTestFiles(keepCorrespondingTestFilesCheckBox.isSelected());
+        settings.setKeepRecentlyEditedTabs(keepRecentlyEditedTabsCheckBox.isSelected());
+        settings.setRecentlyEditedMinutes((Integer) recentlyEditedMinutesSpinner.getValue());
+        settings.setMinimumTabsToKeepOpen((Integer) minimumTabsToKeepSpinner.getValue());
+        settings.setReferenceDepth((Integer) referenceDepthSpinner.getValue());
     }
 }
