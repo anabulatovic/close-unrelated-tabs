@@ -4,6 +4,8 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -119,5 +121,25 @@ public class CloseUnrelatedTabsAction extends AnAction {
                 }
             }
         }
+    }
+
+    // todo: close tabs method
+
+    private boolean isFileModified(FileDocumentManager documentManager, VirtualFile virtualFile) {
+        Document document = documentManager.getDocument(virtualFile);
+        return document != null && documentManager.isDocumentUnsaved(document);
+    }
+
+    private boolean wasRecentlyEdited(FileDocumentManager documentManager, VirtualFile virtualFile, int minutes) {
+        Document document = documentManager.getDocument(virtualFile);
+
+        if (document == null) {
+            return false;
+        }
+
+        long modificationStamp = document.getModificationStamp();
+        // If document has been modified, consider it recently edited.
+        // This is a simplified check, todo: track actual times
+        return documentManager.isDocumentUnsaved(document) || modificationStamp > 0;
     }
 }
