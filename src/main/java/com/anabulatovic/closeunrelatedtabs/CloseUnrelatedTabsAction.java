@@ -13,12 +13,16 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class CloseUnrelatedTabsAction extends AnAction {
@@ -189,7 +193,60 @@ public class CloseUnrelatedTabsAction extends AnAction {
         }
     }
 
-    // todo: close tabs method
+    private void closeUnrelatedTabs(Project project, Set<VirtualFile> relatedFiles) {
+        FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
+        FileDocumentManager documentManager = FileDocumentManager.getInstance();
+        CloseUnrelatedTabsSettings settings = CloseUnrelatedTabsSettings.getInstance();
+
+        VirtualFile[] openFiles = fileEditorManager.getOpenFiles();
+
+        // Build set of test file names to keep if setting is enabled
+        Set<String> testFileNamesToKeep = new HashSet<>();
+        if (settings.isKeepCorrespondingTestFiles()) {
+            for (VirtualFile relatedFile : relatedFiles) {
+                testFileNamesToKeep.addAll(getCorrespondingTestFileNames(relatedFile.getNameWithoutExtension()));
+            }
+        }
+
+        List<VirtualFile> filesToClose = new ArrayList<>();
+        for (VirtualFile file : openFiles) {
+            if (relatedFiles.contains(file)) {
+                continue; // File is related, keep it
+            }
+
+            if (settings.isKeepModifiedTabs() && isFileModified(documentManager, file)) {
+                continue; // File is modified, keep it
+            }
+
+            if (settings.isKeepCorrespondingTestFiles() && isCorrespondingTestFile(file, testFileNamesToKeep)) {
+                continue;
+            }
+
+            filesToClose.add(file);
+
+            int minimumTabs = settings.getMinimumTabsToKeepOpen();
+            int tabsToKeep = openFiles.length - filesToClose.size();
+            if (tabsToKeep < minimumTabs) {
+                int tabsToRemoveFromClosing = minimumTabs - tabsToKeep;
+                for (int i = 0; i < tabsToRemoveFromClosing; i++) {
+                    // Keep the most recently added candidates
+                    filesToClose.removeLast();
+                }
+            }
+
+            if (filesToClose.isEmpty()) {
+                Messages.showInfoMessage(project,
+                        MessageBundle.message("dialog.no.tabs.to.close"),
+                        MessageBundle.message("dialog.title"));
+                return;
+            }
+
+            // Show confirmation dialog if enabled
+            if (settings.isShowConfirmationDialog()) {
+                // todo show dialog
+            }
+        }
+    }
 
     private boolean isFileModified(FileDocumentManager documentManager, VirtualFile virtualFile) {
         Document document = documentManager.getDocument(virtualFile);
