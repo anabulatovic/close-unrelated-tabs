@@ -24,7 +24,6 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -114,8 +113,7 @@ public class CloseUnrelatedTabsAction extends AnAction {
                     indicator.setFraction(1.0);
                 });
 
-                // todo: call close action
-                ApplicationManager.getApplication().invokeLater(() -> {});
+                ApplicationManager.getApplication().invokeLater(() -> closeUnrelatedTabs(project, relatedFiles));
             }
         });
     }
@@ -345,7 +343,9 @@ public class CloseUnrelatedTabsAction extends AnAction {
            messagePanel.add(iconLabel, BorderLayout.WEST);
 
            JLabel messageLabel = new JLabel(MessageBundle.message("dialog.confirm.message", tabCount));
-           messagePanel.add(messageLabel, BorderLayout.NORTH);
+           messagePanel.add(messageLabel, BorderLayout.CENTER);
+
+           panel.add(messagePanel, BorderLayout.NORTH);
 
            // Don't show this again checkbox
            dontShowAgainCheckBox = new JBCheckBox(MessageBundle.message("dialog.dont.show.again"));
