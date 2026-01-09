@@ -245,12 +245,25 @@ public class CloseUnrelatedTabsAction extends AnAction {
                         MessageBundle.message("dialog.title"));
                 return;
             }
+        }
 
-            // Show confirmation dialog if enabled
-            if (settings.isShowConfirmationDialog()) {
-                // todo show dialog
+        // Show confirmation dialog if enabled
+        if (settings.isShowConfirmationDialog()) {
+            ConfirmCloseDialog dialog = new ConfirmCloseDialog(project, filesToClose.size());
+
+            if (dialog.showAndGet()) {
+                return; // user cancelled
+            }
+
+            if (dialog.isDontShowAgain()) {
+                settings.setShowConfirmationDialog(false);
             }
         }
+
+        for (VirtualFile file : filesToClose) {
+            fileEditorManager.closeFile(file);
+        }
+
     }
 
     private boolean isFileModified(FileDocumentManager documentManager, VirtualFile virtualFile) {
@@ -339,6 +352,15 @@ public class CloseUnrelatedTabsAction extends AnAction {
            panel.add(dontShowAgainCheckBox, BorderLayout.SOUTH);
 
            return panel;
+       }
+
+       public boolean isDontShowAgain() {
+           return dontShowAgainCheckBox.isSelected();
+       }
+
+       @Override
+       protected Action @NotNull [] createActions() {
+           return new Action[]{getOKAction(), getCancelAction()};
        }
     }
 }
