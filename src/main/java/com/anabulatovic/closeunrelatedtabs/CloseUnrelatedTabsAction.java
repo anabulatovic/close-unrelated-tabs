@@ -3,6 +3,9 @@ package com.anabulatovic.closeunrelatedtabs;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
 public class CloseUnrelatedTabsAction extends AnAction {
@@ -14,7 +17,9 @@ public class CloseUnrelatedTabsAction extends AnAction {
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        // impl
+        Project project = e.getProject();
+        VirtualFile virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
+        e.getPresentation().setEnabledAndVisible(project != null && virtualFile != null);
     }
 
     @Override
