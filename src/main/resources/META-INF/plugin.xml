@@ -26,8 +26,6 @@
     <depends>com.intellij.modules.platform</depends>
     <resource-bundle>messages.MessageBundle</resource-bundle>
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="MyToolWindow" factoryClass="com.anabulatovic.closeunrelatedtabs.ToolWindowFactoryImpl"
-                    icon="AllIcons.Toolwindows.ToolWindowPalette"/>
         <applicationService serviceImplementation="com.anabulatovic.closeunrelatedtabs.CloseUnrelatedTabsSettings"/>
         <applicationConfigurable
             parentId="editor"
