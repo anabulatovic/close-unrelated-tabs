@@ -19,6 +19,9 @@ public final class CloseUnrelatedTabsSettings implements PersistentStateComponen
         public boolean keepModifiedTabs = true;
         public int minimumTabsToKeep = 1;
         public int referenceDepth = 1;
+        public boolean keepCorrespondingTestFiles = true;
+        public boolean keepRecentlyEditedTabs = false;
+        public int recentlyEditedMinutes = 10;
     }
 
     private State state = new State();
@@ -67,6 +70,30 @@ public final class CloseUnrelatedTabsSettings implements PersistentStateComponen
 
     public void setReferenceDepth(int referenceDepth) {
         state.referenceDepth = referenceDepth;
+    }
+
+    public boolean isKeepCorrespondingTestFiles() {
+        return state.keepCorrespondingTestFiles;
+    }
+
+    public void setKeepCorrespondingTestFiles(boolean shouldKeep) {
+        state.keepCorrespondingTestFiles = shouldKeep;
+    }
+
+    public boolean isKeepRecentlyEditedTabs() {
+        return state.keepRecentlyEditedTabs;
+    }
+
+    public void setKeepRecentlyEditedTabs(boolean shouldKeep) {
+        state.keepCorrespondingTestFiles = shouldKeep;
+    }
+
+    public int getRecentlyEditedMinutes() {
+        return state.recentlyEditedMinutes;
+    }
+
+    public void setRecentlyEditedMinutes(int recentlyEditedMinutes) {
+        state.recentlyEditedMinutes = recentlyEditedMinutes;
     }
 
 }
