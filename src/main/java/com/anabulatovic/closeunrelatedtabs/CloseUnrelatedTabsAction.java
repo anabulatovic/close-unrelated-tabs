@@ -13,6 +13,7 @@ import com.intellij.psi.*;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class CloseUnrelatedTabsAction extends AnAction {
@@ -141,5 +142,44 @@ public class CloseUnrelatedTabsAction extends AnAction {
         // If document has been modified, consider it recently edited.
         // This is a simplified check, todo: track actual times
         return documentManager.isDocumentUnsaved(document) || modificationStamp > 0;
+    }
+
+    private Set<String> getCorrespondingTestFileNames(String baseFileName) {
+        Set<String> testNames = new HashSet<>();
+        // Common test file naming conventions
+        testNames.add(baseFileName + "Test");
+        testNames.add(baseFileName + "Tests");
+        testNames.add(baseFileName + "Spec");
+        testNames.add("Test" + baseFileName);
+        testNames.add(baseFileName + "_test");
+        testNames.add("test_" + baseFileName);
+
+        // Also handle if the file itself is a test file - keep the source
+        if (baseFileName.endsWith("Test") || baseFileName.endsWith("Tests")) {
+            testNames.add(baseFileName.replaceAll("Tests?$", ""));
+        }
+
+        if (baseFileName.endsWith("Spec")) {
+            testNames.add(baseFileName.replaceAll("Spec$", ""));
+        }
+
+        if (baseFileName.startsWith("Test")) {
+            testNames.add(baseFileName.substring(4));
+        }
+
+        if (baseFileName.endsWith("_test")) {
+            testNames.add(baseFileName.replace("_test", ""));
+        }
+
+        if (baseFileName.startsWith("test_")) {
+            testNames.add(baseFileName.substring(5));
+        }
+
+        return testNames;
+    }
+
+    private boolean isCorrespondingTestFile(VirtualFile virtualFile, Set<String> testFileNamesToKeep) {
+        String nameWithoutExtension = virtualFile.getNameWithoutExtension();
+        return testFileNamesToKeep.contains(nameWithoutExtension);
     }
 }
