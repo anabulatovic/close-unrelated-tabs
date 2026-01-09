@@ -24,6 +24,15 @@ public class CloseUnrelatedTabsAction extends AnAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        // impl
+        Project project = e.getProject();
+
+        if (project == null) return;
+
+        VirtualFile virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
+
+        if (virtualFile == null) return;
+
+        CloseUnrelatedTabsSettings settings = CloseUnrelatedTabsSettings.getInstance();
+        int referenceDepth; // add load from settings
     }
 }
