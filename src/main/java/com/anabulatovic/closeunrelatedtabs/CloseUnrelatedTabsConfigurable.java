@@ -1,12 +1,21 @@
 package com.anabulatovic.closeunrelatedtabs;
 
 import com.intellij.openapi.options.Configurable;
+import com.intellij.ui.JBIntSpinner;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
 public class CloseUnrelatedTabsConfigurable implements Configurable {
+
+    private JCheckBox showConfirmationDialogCheckBox;
+    private JCheckBox keepModifiedTabsCheckBox;
+    private JCheckBox keepCorrespondingTestFilesCheckBox;
+    private JCheckBox keepRecentlyEditedTabsCheckBox;
+    private JBIntSpinner minimumTabsToKeepSpinner;
+    private JBIntSpinner referenceDepthSpinner;
+    private JBIntSpinner recentlyEditedMinutesSpinner;
 
     @Nls(capitalization = Nls.Capitalization.Title)
     @Override
