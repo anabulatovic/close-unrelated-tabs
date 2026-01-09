@@ -4,9 +4,14 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
@@ -43,7 +48,67 @@ public class CloseUnrelatedTabsAction extends AnAction {
         CloseUnrelatedTabsSettings settings = CloseUnrelatedTabsSettings.getInstance();
         int referenceDepth = settings.getReferenceDepth();
 
-        // todo: add progress bar
+        ProgressManager.getInstance().run(new Task.Backgroundable(project, MessageBundle.message("action.scanning.references"), true) {
+            @Override
+            public void run(@NotNull ProgressIndicator indicator) {
+                indicator.setIndeterminate(false);
+                indicator.setFraction(0.0);
+
+                Set<VirtualFile> relatedFiles = new HashSet<>();
+                relatedFiles.add(virtualFile); // The clicked file is always related
+
+                ReadAction.run(() -> {
+                    PsiManager psiManager = PsiManager.getInstance(project);
+
+                    // Process files at each depth level
+                    Set<VirtualFile> currentLevel = new HashSet<>();
+                    currentLevel.add(virtualFile);
+
+                    for (int depth = 0; depth < referenceDepth; depth++) {
+                        Set<VirtualFile> nextLevel = new HashSet<>();
+
+                        for (VirtualFile file : currentLevel) {
+                            PsiFile psiFile = psiManager.findFile(file);
+                            if (psiFile == null) continue;
+
+                            indicator.setText(MessageBundle.message("action.scanning.outgoing") + " (depth " + (depth + 1) + ")");
+                            indicator.setFraction(0.2 + (0.6 * depth / referenceDepth));
+
+                            // Find files that this file references (outgoing references)
+                            Set<VirtualFile> outgoing = new HashSet<>();
+                            findOutgoingReferences(psiFile, outgoing);
+
+                            for (VirtualFile vf : outgoing) {
+                                if (!relatedFiles.contains(vf)) {
+                                    nextLevel.add(vf);
+                                    relatedFiles.add(vf);
+                                }
+                            }
+
+                            indicator.setText(MessageBundle.message("action.scanning.incoming") + " (depth " + (depth + 1) + ")");
+
+                            Set<VirtualFile> incoming = new HashSet<>();
+                            findIncomingReferences(psiFile, project, incoming);
+
+                            for (VirtualFile vf : incoming) {
+                                if (!relatedFiles.contains(vf)) {
+                                    nextLevel.add(vf);
+                                    relatedFiles.add(vf);
+                                }
+                            }
+                        }
+
+                        currentLevel = nextLevel;
+                        if (currentLevel.isEmpty()) break; // No new files found
+                    }
+
+                    indicator.setFraction(1.0);
+                });
+
+                // todo: call close action
+                ApplicationManager.getApplication().invokeLater(() -> {});
+            }
+        });
     }
 
     private void findOutgoingReferences(PsiFile psiFile, Set<VirtualFile> relatedFiles) {
