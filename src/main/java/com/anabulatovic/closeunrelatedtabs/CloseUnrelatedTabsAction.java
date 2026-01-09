@@ -33,6 +33,8 @@ public class CloseUnrelatedTabsAction extends AnAction {
         if (virtualFile == null) return;
 
         CloseUnrelatedTabsSettings settings = CloseUnrelatedTabsSettings.getInstance();
-        int referenceDepth; // add load from settings
+        int referenceDepth = settings.getReferenceDepth();
+
+        // todo: add progress bar
     }
 }

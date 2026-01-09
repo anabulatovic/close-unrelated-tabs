@@ -18,7 +18,7 @@ public final class CloseUnrelatedTabsSettings implements PersistentStateComponen
         public boolean showConfirmationDialog = true;
         public boolean keepModifiedTabs = true;
         public int minimumTabsToKeep = 1;
-
+        public int referenceDepth = 1;
     }
 
     private State state = new State();
@@ -36,4 +36,37 @@ public final class CloseUnrelatedTabsSettings implements PersistentStateComponen
     public void loadState(@NotNull State state) {
         this.state = state;
     }
+
+    public boolean isShowConfirmationDialog() {
+        return state.showConfirmationDialog;
+    }
+
+    public void setShowConfirmationDialog(boolean shouldShow) {
+        state.showConfirmationDialog = shouldShow;
+    }
+
+    public boolean isKeepModifiedTabs() {
+        return state.keepModifiedTabs;
+    }
+
+    public void setKeepModifiedTabs(boolean shouldKeep) {
+        state.keepModifiedTabs = shouldKeep;
+    }
+
+    public int getMinimumTabsToKeepOpen() {
+        return state.minimumTabsToKeep;
+    }
+
+    public void setMinimumTabsToKeepOpen(int minimumTabsToKeepOpen) {
+        state.minimumTabsToKeep = minimumTabsToKeepOpen;
+    }
+
+    public int getReferenceDepth() {
+        return state.referenceDepth;
+    }
+
+    public void setReferenceDepth(int referenceDepth) {
+        state.referenceDepth = referenceDepth;
+    }
+
 }
