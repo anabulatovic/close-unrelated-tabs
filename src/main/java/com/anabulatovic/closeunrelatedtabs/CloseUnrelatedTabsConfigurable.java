@@ -3,7 +3,7 @@ package com.anabulatovic.closeunrelatedtabs;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.ui.JBIntSpinner;
 import com.intellij.ui.components.JBCheckBox;
-import com.q.L.L.A.J;
+import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,8 +54,11 @@ public class CloseUnrelatedTabsConfigurable implements Configurable {
         minimumTabsToKeepSpinner = new JBIntSpinner(settings.getMinimumTabsToKeepOpen(), 0, 100);
         referenceDepthSpinner = new JBIntSpinner(settings.getReferenceDepth(), 1, 10);
 
-        return new JComponent() {
-        };
+        return FormBuilder.createFormBuilder()
+                .addComponent(showConfirmationDialogCheckBox)
+                .addComponent(keepModifiedTabsCheckBox)
+                .addComponent(keepCorrespondingTestFilesCheckBox)
+                .getPanel();
     }
 
     @Override
