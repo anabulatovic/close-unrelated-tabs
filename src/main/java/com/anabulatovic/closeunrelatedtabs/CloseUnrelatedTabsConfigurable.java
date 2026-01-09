@@ -11,11 +11,12 @@ public class CloseUnrelatedTabsConfigurable implements Configurable {
     @Nls(capitalization = Nls.Capitalization.Title)
     @Override
     public String getDisplayName() {
-        return "";
+        return MessageBundle.message("settings.display.name");
     }
 
     @Override
     public @Nullable JComponent createComponent() {
+        CloseUnrelatedTabsSettings settings = CloseUnrelatedTabsSettings.getInstance();
         return new JComponent() {
         };
     }
