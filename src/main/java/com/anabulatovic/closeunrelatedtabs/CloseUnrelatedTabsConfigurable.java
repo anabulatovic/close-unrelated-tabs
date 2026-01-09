@@ -88,4 +88,17 @@ public class CloseUnrelatedTabsConfigurable implements Configurable {
         settings.setMinimumTabsToKeepOpen((Integer) minimumTabsToKeepSpinner.getValue());
         settings.setReferenceDepth((Integer) referenceDepthSpinner.getValue());
     }
+
+    @Override
+    public void reset() {
+        CloseUnrelatedTabsSettings settings = CloseUnrelatedTabsSettings.getInstance();
+
+        showConfirmationDialogCheckBox.setSelected(settings.isShowConfirmationDialog());
+        keepModifiedTabsCheckBox.setSelected(settings.isKeepModifiedTabs());
+        keepCorrespondingTestFilesCheckBox.setSelected(settings.isKeepCorrespondingTestFiles());
+        keepRecentlyEditedTabsCheckBox.setSelected(settings.isKeepRecentlyEditedTabs());
+        recentlyEditedMinutesSpinner.setValue(settings.getRecentlyEditedMinutes());
+        minimumTabsToKeepSpinner.setValue(settings.getMinimumTabsToKeepOpen());
+        referenceDepthSpinner.setValue(settings.getReferenceDepth());
+    }
 }
