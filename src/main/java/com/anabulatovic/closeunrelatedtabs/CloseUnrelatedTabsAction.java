@@ -19,15 +19,16 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.ui.components.JBCheckBox;
+import com.intellij.ui.components.JBScrollBar;
+import com.intellij.ui.components.JBScrollPane;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 
 public class CloseUnrelatedTabsAction extends AnAction {
 
@@ -225,6 +226,14 @@ public class CloseUnrelatedTabsAction extends AnAction {
                 continue;
             }
 
+            if (settings.isKeepRecentlyEditedTabs() && wasRecentlyEdited(documentManager, file, settings.getRecentlyEditedMinutes())) {
+                continue;
+            }
+
+            if (matchesExcludePattern(file, settings.getExcludePatterns())) {
+                continue;
+            }
+
             filesToClose.add(file);
 
             int minimumTabs = settings.getMinimumTabsToKeepOpen();
@@ -245,11 +254,24 @@ public class CloseUnrelatedTabsAction extends AnAction {
             }
         }
 
+        // Show preview dialog if enabled
+        if (settings.isShowPreviewBeforeClosing()) {
+            PreviewDialog previewDialog = new PreviewDialog(project, filesToClose);
+            if (!previewDialog.showAndGet()) {
+                return; // user cancelled
+            }
+            // Get potentially modified list from preview
+            filesToClose = previewDialog.getFilesToClose();
+            if (filesToClose.isEmpty()) {
+                return;
+            }
+        }
+
         // Show confirmation dialog if enabled
         if (settings.isShowConfirmationDialog()) {
             ConfirmCloseDialog dialog = new ConfirmCloseDialog(project, filesToClose.size());
 
-            if (dialog.showAndGet()) {
+            if (!dialog.showAndGet()) {
                 return; // user cancelled
             }
 
@@ -280,6 +302,31 @@ public class CloseUnrelatedTabsAction extends AnAction {
         // If document has been modified, consider it recently edited.
         // This is a simplified check, todo: track actual times
         return documentManager.isDocumentUnsaved(document) || modificationStamp > 0;
+    }
+
+    private boolean matchesExcludePattern(VirtualFile file, List<String> patterns) {
+        String fileName = file.getName();
+        String filePath = file.getPath();
+
+        for (String pattern : patterns) {
+            if (matchesPattern(fileName, pattern) || matchesPattern(filePath, pattern)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean matchesPattern(String text, String pattern) {
+        String regex = pattern
+                .replace(".", "\\.")
+                .replace("*", ".*")
+                .replace("?", ".");
+        try {
+            return text.matches(regex) || text.matches(".*" + regex);
+        } catch (Exception e) {
+            return text.contains(pattern.replace("*", "").replace("?", ""));
+        }
     }
 
     private Set<String> getCorrespondingTestFileNames(String baseFileName) {
@@ -319,6 +366,70 @@ public class CloseUnrelatedTabsAction extends AnAction {
     private boolean isCorrespondingTestFile(VirtualFile virtualFile, Set<String> testFileNamesToKeep) {
         String nameWithoutExtension = virtualFile.getNameWithoutExtension();
         return testFileNamesToKeep.contains(nameWithoutExtension);
+    }
+
+    // Preview Dialog
+    private static class PreviewDialog extends DialogWrapper {
+        private final List<VirtualFile> files;
+        private final Map<VirtualFile, JBCheckBox> checkBoxes = new LinkedHashMap<>();
+
+        public PreviewDialog(@Nullable Project project, List<VirtualFile> filesToClose) {
+            super(project);
+            this.files = new ArrayList<>(filesToClose);
+            setTitle(MessageBundle.message("preview.dialog.title"));
+            init();
+        }
+
+        @Override
+        protected @Nullable JComponent createCenterPanel() {
+            JPanel panel = new JPanel(new BorderLayout(0, 10));
+
+            JLabel messageLabel = new JLabel(MessageBundle.message("preview.dialog.message", files.size()));
+            panel.add(messageLabel, BorderLayout.NORTH);
+
+            JPanel listPanel = new JPanel();
+            listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
+
+            for (VirtualFile file : files) {
+                JBCheckBox checkBox = new JBCheckBox(file.getName(), true);
+                checkBox.setToolTipText(file.getPath());
+                checkBoxes.put(file, checkBox);
+                listPanel.add(checkBox);
+            }
+
+            JBScrollPane scrollPane = new JBScrollPane(listPanel);
+            scrollPane.setPreferredSize(new Dimension(400, 300));
+            panel.add(scrollPane, BorderLayout.CENTER);
+
+            // Select all/deselect all buttons
+            JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            JButton selectAll = new JButton("Select All");
+            JButton deselectAll = new JButton("Deselect All");
+
+            selectAll.addActionListener(e -> checkBoxes.values().forEach(cb -> cb.setSelected(true)));
+            deselectAll.addActionListener(e -> checkBoxes.values().forEach(cb -> cb.setSelected(false)));
+
+            buttonPanel.add(selectAll);
+            buttonPanel.add(deselectAll);
+            panel.add(buttonPanel, BorderLayout.SOUTH);
+
+            return panel;
+        }
+
+        public List<VirtualFile> getFilesToClose() {
+            List<VirtualFile> result = new ArrayList<>();
+            for (Map.Entry<VirtualFile, JBCheckBox> entry : checkBoxes.entrySet()) {
+                if (entry.getValue().isSelected()) {
+                    result.add(entry.getKey());
+                }
+            }
+            return result;
+        }
+
+        @Override
+        protected Action @NotNull [] createActions() {
+            return new Action[]{getOKAction(), getCancelAction()};
+        }
     }
 
     // Confirmation Dialog
