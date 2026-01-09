@@ -13,12 +13,17 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.searches.ReferencesSearch;
+import com.intellij.ui.components.JBCheckBox;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -303,5 +308,37 @@ public class CloseUnrelatedTabsAction extends AnAction {
     private boolean isCorrespondingTestFile(VirtualFile virtualFile, Set<String> testFileNamesToKeep) {
         String nameWithoutExtension = virtualFile.getNameWithoutExtension();
         return testFileNamesToKeep.contains(nameWithoutExtension);
+    }
+
+    // Confirmation Dialog
+    private static class ConfirmCloseDialog extends DialogWrapper {
+       private final int tabCount;
+       private JBCheckBox dontShowAgainCheckBox;
+
+       public ConfirmCloseDialog(@Nullable Project project, int tabCount) {
+           super(project);
+           this.tabCount = tabCount;
+           setTitle(MessageBundle.message("dialog.title"));
+           init();
+       }
+
+       @Override
+       protected @Nullable JComponent createCenterPanel() {
+           JPanel panel = new JPanel(new BorderLayout(0, 10));
+
+           // Warning message with icon
+           JPanel messagePanel = new JPanel(new BorderLayout(10, 0));
+           JLabel iconLabel = new JLabel(Messages.getQuestionIcon());
+           messagePanel.add(iconLabel, BorderLayout.WEST);
+
+           JLabel messageLabel = new JLabel(MessageBundle.message("dialog.confirm.message", tabCount));
+           messagePanel.add(messageLabel, BorderLayout.NORTH);
+
+           // Don't show this again checkbox
+           dontShowAgainCheckBox = new JBCheckBox(MessageBundle.message("dialog.dont.show.again"));
+           panel.add(dontShowAgainCheckBox, BorderLayout.SOUTH);
+
+           return panel;
+       }
     }
 }
