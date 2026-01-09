@@ -55,7 +55,7 @@ public class CloseUnrelatedTabsConfigurable implements Configurable {
         );
 
         keepRecentlyEditedTabsCheckBox = new JBCheckBox(
-                MessageBundle.message("settings.show.confirmation.dialog"),
+                MessageBundle.message("settings.keep.recently.edited"),
                 settings.isKeepRecentlyEditedTabs()
         );
 
