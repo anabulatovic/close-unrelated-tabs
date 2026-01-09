@@ -6,6 +6,10 @@ import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.components.Storage;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service(Service.Level.APP)
 @State(
@@ -22,6 +26,8 @@ public final class CloseUnrelatedTabsSettings implements PersistentStateComponen
         public boolean keepCorrespondingTestFiles = true;
         public boolean keepRecentlyEditedTabs = false;
         public int recentlyEditedMinutes = 10;
+        public List<String> excludePatterns = new ArrayList<>();
+        public boolean showPreviewBeforeClosing = false;
     }
 
     private State state = new State();
@@ -31,7 +37,7 @@ public final class CloseUnrelatedTabsSettings implements PersistentStateComponen
     }
 
     @Override
-    public CloseUnrelatedTabsSettings.State getState() {
+    public @Nullable CloseUnrelatedTabsSettings.State getState() {
         return state;
     }
 
@@ -94,6 +100,22 @@ public final class CloseUnrelatedTabsSettings implements PersistentStateComponen
 
     public void setRecentlyEditedMinutes(int recentlyEditedMinutes) {
         state.recentlyEditedMinutes = recentlyEditedMinutes;
+    }
+
+    public boolean isShowPreviewBeforeClosing() {
+        return state.showPreviewBeforeClosing;
+    }
+
+    public void setShowPreviewBeforeClosing(boolean shouldShowPreviewBeforeClosing) {
+        state.showPreviewBeforeClosing = shouldShowPreviewBeforeClosing;
+    }
+
+    public List<String> getExcludePatterns() {
+        return state.excludePatterns;
+    }
+
+    public void setExcludePatterns(List<String> patterns) {
+        state.excludePatterns = patterns;
     }
 
 }
