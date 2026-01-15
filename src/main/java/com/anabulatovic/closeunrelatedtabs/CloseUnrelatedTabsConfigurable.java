@@ -21,7 +21,6 @@ public class CloseUnrelatedTabsConfigurable implements Configurable {
     private JBCheckBox showConfirmationDialogCheckBox;
     private JBCheckBox keepModifiedTabsCheckBox;
     private JBCheckBox keepCorrespondingTestFilesCheckBox;
-    private JBCheckBox keepRecentlyEditedTabsCheckBox;
     private JBIntSpinner minimumTabsToKeepSpinner;
     private JBIntSpinner referenceDepthSpinner;
     private JBIntSpinner recentlyEditedMinutesSpinner;
@@ -52,11 +51,6 @@ public class CloseUnrelatedTabsConfigurable implements Configurable {
         keepCorrespondingTestFilesCheckBox = new JBCheckBox(
                 MessageBundle.message("settings.keep.test.files"),
                 settings.isKeepCorrespondingTestFiles()
-        );
-
-        keepRecentlyEditedTabsCheckBox = new JBCheckBox(
-                MessageBundle.message("settings.keep.recently.edited"),
-                settings.isKeepRecentlyEditedTabs()
         );
 
         showPreviewBeforeClosingCheckBox = new JBCheckBox(
@@ -99,7 +93,6 @@ public class CloseUnrelatedTabsConfigurable implements Configurable {
 
         //Recently edited panel with checkbox and spinner
         JPanel recentlyEditedPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        recentlyEditedPanel.add(keepRecentlyEditedTabsCheckBox);
         recentlyEditedPanel.add(Box.createHorizontalStrut(10));
         recentlyEditedPanel.add(recentlyEditedMinutesSpinner);
         recentlyEditedPanel.add(Box.createHorizontalStrut(5));
@@ -141,7 +134,6 @@ public class CloseUnrelatedTabsConfigurable implements Configurable {
         if (showConfirmationDialogCheckBox.isSelected() != settings.isShowConfirmationDialog()) return true;
         if (keepModifiedTabsCheckBox.isSelected() != settings.isKeepModifiedTabs()) return true;
         if (keepCorrespondingTestFilesCheckBox.isSelected() != settings.isKeepCorrespondingTestFiles()) return true;
-        if (keepRecentlyEditedTabsCheckBox.isSelected() != settings.isKeepRecentlyEditedTabs()) return true;
         if (showPreviewBeforeClosingCheckBox.isSelected() != settings.isShowPreviewBeforeClosing()) return true;
         if ((Integer) recentlyEditedMinutesSpinner.getValue() != settings.getRecentlyEditedMinutes()) return true;
         if ((Integer) minimumTabsToKeepSpinner.getValue() != settings.getMinimumTabsToKeepOpen()) return true;
@@ -163,7 +155,6 @@ public class CloseUnrelatedTabsConfigurable implements Configurable {
         settings.setShowConfirmationDialog(showConfirmationDialogCheckBox.isSelected());
         settings.setKeepModifiedTabs(keepModifiedTabsCheckBox.isSelected());
         settings.setKeepCorrespondingTestFiles(keepCorrespondingTestFilesCheckBox.isSelected());
-        settings.setKeepRecentlyEditedTabs(keepRecentlyEditedTabsCheckBox.isSelected());
         settings.setRecentlyEditedMinutes((Integer) recentlyEditedMinutesSpinner.getValue());
         settings.setMinimumTabsToKeepOpen((Integer) minimumTabsToKeepSpinner.getValue());
         settings.setReferenceDepth((Integer) referenceDepthSpinner.getValue());
@@ -183,7 +174,6 @@ public class CloseUnrelatedTabsConfigurable implements Configurable {
         showConfirmationDialogCheckBox.setSelected(settings.isShowConfirmationDialog());
         keepModifiedTabsCheckBox.setSelected(settings.isKeepModifiedTabs());
         keepCorrespondingTestFilesCheckBox.setSelected(settings.isKeepCorrespondingTestFiles());
-        keepRecentlyEditedTabsCheckBox.setSelected(settings.isKeepRecentlyEditedTabs());
         showPreviewBeforeClosingCheckBox.setSelected(settings.isShowPreviewBeforeClosing());
         recentlyEditedMinutesSpinner.setValue(settings.getRecentlyEditedMinutes());
         minimumTabsToKeepSpinner.setValue(settings.getMinimumTabsToKeepOpen());
