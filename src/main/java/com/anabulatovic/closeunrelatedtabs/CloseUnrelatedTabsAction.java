@@ -19,13 +19,11 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.ui.components.JBCheckBox;
-import com.intellij.ui.components.JBScrollBar;
 import com.intellij.ui.components.JBScrollPane;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
@@ -99,12 +97,7 @@ public class CloseUnrelatedTabsAction extends AnAction {
                             Set<VirtualFile> incoming = new HashSet<>();
                             findIncomingReferences(psiFile, project, incoming);
 
-                            for (VirtualFile vf : incoming) {
-                                if (!relatedFiles.contains(vf)) {
-                                    nextLevel.add(vf);
-                                    relatedFiles.add(vf);
-                                }
-                            }
+                            relatedFiles.addAll(incoming);
                         }
 
                         currentLevel = nextLevel;

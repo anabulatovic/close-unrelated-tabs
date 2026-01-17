@@ -44,6 +44,9 @@
             <add-to-group group-id="EditorTabPopupMenu"
                           anchor="first"/>
 
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt U"/>
+            <keyboard-shortcut keymap="Mac OS X" first-keystroke="meta alt U"/>
+
         </action>
     </actions>
 </idea-plugin>
