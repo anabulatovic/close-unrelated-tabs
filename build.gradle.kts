@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.anabulatovic"
-version = "0.1.0"
+version = "0.1.1"
 
 repositories {
     mavenCentral()
@@ -29,7 +29,7 @@ intellijPlatform {
         }
 
         changeNotes = """
-            Initial version
+            Bug fixes; keymap added
         """.trimIndent()
     }
 }
