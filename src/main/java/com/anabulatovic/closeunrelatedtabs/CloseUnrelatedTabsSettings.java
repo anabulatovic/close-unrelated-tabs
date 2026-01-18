@@ -28,6 +28,7 @@ public final class CloseUnrelatedTabsSettings implements PersistentStateComponen
         public int recentlyEditedMinutes = 10;
         public List<String> excludePatterns = new ArrayList<>();
         public boolean showPreviewBeforeClosing = false;
+        public boolean keepPinnedTabs = true;
     }
 
     private State state = new State();
@@ -88,6 +89,14 @@ public final class CloseUnrelatedTabsSettings implements PersistentStateComponen
 
     public boolean isKeepRecentlyEditedTabs() {
         return state.keepRecentlyEditedTabs;
+    }
+
+    public void setKeepPinnedTabs(boolean shouldKeep) {
+        state.keepPinnedTabs = shouldKeep;
+    }
+
+    public boolean isKeepPinnedTabs() {
+        return state.keepPinnedTabs;
     }
 
     public void setKeepRecentlyEditedTabs(boolean shouldKeep) {

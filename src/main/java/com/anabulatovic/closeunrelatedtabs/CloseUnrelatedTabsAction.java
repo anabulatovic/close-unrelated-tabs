@@ -9,6 +9,8 @@ import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.impl.EditorWindow;
+import com.intellij.openapi.fileEditor.impl.FileEditorManagerImpl;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -227,6 +229,10 @@ public class CloseUnrelatedTabsAction extends AnAction {
                 continue;
             }
 
+            if (settings.isKeepPinnedTabs() && isPinned(project, file)) {
+                continue;
+            }
+
             filesToClose.add(file);
 
             int minimumTabs = settings.getMinimumTabsToKeepOpen();
@@ -281,7 +287,11 @@ public class CloseUnrelatedTabsAction extends AnAction {
 
     private boolean isFileModified(FileDocumentManager documentManager, VirtualFile virtualFile) {
         Document document = documentManager.getDocument(virtualFile);
-        return document != null && documentManager.isDocumentUnsaved(document);
+        if (document == null) {
+            return false;
+        }
+
+        return document.getModificationStamp() != virtualFile.getModificationStamp();
     }
 
     private boolean wasRecentlyEdited(FileDocumentManager documentManager, VirtualFile virtualFile, int minutes) {
@@ -295,6 +305,21 @@ public class CloseUnrelatedTabsAction extends AnAction {
         // If document has been modified, consider it recently edited.
         // This is a simplified check, todo: track actual times
         return documentManager.isDocumentUnsaved(document) || modificationStamp > 0;
+    }
+
+    private boolean isPinned(Project project, VirtualFile file) {
+        FileEditorManager manager = FileEditorManager.getInstance(project);
+
+        if (!(manager instanceof FileEditorManagerImpl impl)) {
+            return false;
+        }
+
+        for (EditorWindow window : impl.getWindows()) {
+            if (window.isFilePinned(file)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean matchesExcludePattern(VirtualFile file, List<String> patterns) {
