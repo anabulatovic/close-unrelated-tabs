@@ -8,7 +8,7 @@
     <description><![CDATA[
         <p>Close all editor tabs that are not related to the current file.</p>
 
-        <p>Right-click on any editor tab amd select <b>"Close Unrelated Tabs"</b> to keep only tabs that:</p>
+        <p>Right-click on any editor tab and select <b>"Close Unrelated Tabs"</b> to keep only tabs that:</p>
         <ul>
             <li>Reference the clicked file (imports, usages)</li>
             <li>Are referenced by the clicked file</li>
