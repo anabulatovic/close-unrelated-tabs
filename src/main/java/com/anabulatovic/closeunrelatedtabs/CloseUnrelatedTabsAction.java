@@ -9,6 +9,7 @@ import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
 import com.intellij.openapi.fileEditor.impl.EditorWindow;
 import com.intellij.openapi.fileEditor.impl.FileEditorManagerImpl;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -308,17 +309,13 @@ public class CloseUnrelatedTabsAction extends AnAction {
     }
 
     private boolean isPinned(Project project, VirtualFile file) {
-        FileEditorManager manager = FileEditorManager.getInstance(project);
+        FileEditorManagerEx manager = FileEditorManagerEx.getInstanceEx(project);
+        EditorWindow window = manager.getCurrentWindow();
 
-        if (!(manager instanceof FileEditorManagerImpl impl)) {
-            return false;
+        if (window != null) {
+            return window.isFilePinned(file);
         }
 
-        for (EditorWindow window : impl.getWindows()) {
-            if (window.isFilePinned(file)) {
-                return true;
-            }
-        }
         return false;
     }
 
