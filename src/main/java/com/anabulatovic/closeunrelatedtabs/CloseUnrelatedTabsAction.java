@@ -209,12 +209,23 @@ public class CloseUnrelatedTabsAction extends AnAction {
         }
 
         List<VirtualFile> filesToClose = new ArrayList<>();
+
+        // Counters for the toast
+        int pinnedKept = 0;
+        int modifiedKept = 0;
+        int relatedKept = 0;
+
+        // Determine if we can use EditorWindow for pinned tabs
+        boolean pinnedSupported = FileEditorManager.getInstance(project) instanceof FileEditorManagerEx;
+
         for (VirtualFile file : openFiles) {
             if (relatedFiles.contains(file)) {
+                relatedKept++;
                 continue; // File is related, keep it
             }
 
             if (settings.isKeepModifiedTabs() && isFileModified(documentManager, file)) {
+                modifiedKept++;
                 continue; // File is modified, keep it
             }
 
@@ -230,7 +241,9 @@ public class CloseUnrelatedTabsAction extends AnAction {
                 continue;
             }
 
-            if (settings.isKeepPinnedTabs() && isPinned(project, file)) {
+            // Skip pinned tabs only if supported
+            if (settings.isKeepPinnedTabs() && pinnedSupported && isPinned(project, file)) {
+                pinnedKept++;
                 continue;
             }
 
@@ -280,10 +293,25 @@ public class CloseUnrelatedTabsAction extends AnAction {
             }
         }
 
+        // Close files
+        int closedCount = 0;
         for (VirtualFile file : filesToClose) {
             fileEditorManager.closeFile(file);
+            closedCount++;
         }
 
+        // Show toast summary
+        if (closedCount > 0 || pinnedKept > 0 || modifiedKept > 0 || relatedKept > 0) {
+            String message = String.format(
+                    "Closed %d tabs · %d pinned kept · %d modified kept · %d related kept",
+                    closedCount, pinnedKept, modifiedKept, relatedKept
+            );
+
+            com.intellij.notification.NotificationGroupManager.getInstance()
+                    .getNotificationGroup("CloseUnrelatedTabs")
+                    .createNotification(message, com.intellij.notification.NotificationType.INFORMATION)
+                    .notify(project);
+        }
     }
 
     private boolean isFileModified(FileDocumentManager documentManager, VirtualFile virtualFile) {
