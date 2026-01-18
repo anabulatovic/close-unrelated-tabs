@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.anabulatovic"
-version = "0.1.1"
+version = "0.2.0"
 
 repositories {
     mavenCentral()
@@ -29,7 +29,7 @@ intellijPlatform {
         }
 
         changeNotes = """
-            Bug fixes; keymap added
+            Added support for pinned tabs; added toast message with info on how many tabs have been closed or kept
         """.trimIndent()
     }
 }
