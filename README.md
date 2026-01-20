@@ -1,6 +1,6 @@
 # Close Unrelated Tabs
 
-[![JetBrains Marketplace](https://img.shields.io/badge/Marketplace-Close-Unrelated-Tabs-blue)](https://plugins.jetbrains.com/plugin/29784-close-unrelated-tabs)
+[![JetBrains Marketplace](https://img.shields.io/badge/Marketplace-Close%20Unrelated%20Tabs-blue)](https://plugins.jetbrains.com/plugin/29784-close-unrelated-tabs)
 ![Version](https://img.shields.io/jetbrains/plugin/v/29784-close-unrelated-tabs)
 ![Downloads](https://img.shields.io/jetbrains/plugin/d/29784-close-unrelated-tabs)
 
