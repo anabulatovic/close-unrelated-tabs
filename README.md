@@ -1,5 +1,9 @@
 # Close Unrelated Tabs
 
+[![JetBrains Marketplace](https://img.shields.io/badge/Marketplace-Close-Unrelated-Tabs-blue)](https://plugins.jetbrains.com/plugin/29784-close-unrelated-tabs)
+![Version](https://img.shields.io/jetbrains/plugin/v/29784-close-unrelated-tabs)
+![Downloads](https://img.shields.io/jetbrains/plugin/d/29784-close-unrelated-tabs)
+
 An IntelliJ‑based IDE plugin that helps you focus by automatically closing editor tabs that are not related to the current file.
 
 When working in large codebases, it’s easy to end up with dozens of open files. **Close Unrelated Tabs** keeps only the files that actually matter for what you’re working on right now.
